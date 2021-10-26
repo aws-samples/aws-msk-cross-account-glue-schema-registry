@@ -1,0 +1,190 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  **WARNING** This template creates EC2
+  instances, Cloud9 environment and related
+  resources. You will be billed for the AWS
+  resources used if you create a stack from
+  this template.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Amazon MSK clients configuration parameters"
+        Parameters:
+          - VPCStackName
+          - KeyName
+          - LatestAmiId
+          - KafkaProducerConsumerRole
+    ParameterLabels:
+      VPCStackName:
+        default: "Name of an VPC Stack created prior to this stack"
+      KeyName:
+        default: "Name of an existing EC2 KeyPair to enable SSH access to the instances"
+      LatestAmiId:
+        default: "Latest EC2 AMI id"
+      KafkaProducerConsumerRole:
+        default: "IAM role name which allows Producer and Consumer instances to assume role in AWS Glue Schema Registry account"
+Parameters:
+  VPCStackName:
+    Type: String
+    Default: MSKVPCStack
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: Can contain only ASCII characters.
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+  KafkaProducerConsumerRole:
+    Type: String
+    Default: "KafkaProducerConsumerRole"
+Resources:
+  KafkaClientInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via port 22 from BastionHostSecurityGroup
+      VpcId: !ImportValue
+        'Fn::Sub': '${VPCStackName}-VPCID'
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: !ImportValue
+          'Fn::Sub': '${VPCStackName}-PublicSubnetCidr'
+      SecurityGroupEgress:
+      - IpProtocol: -1
+        CidrIp: 0.0.0.0/0
+  Cloud9EC2Bastion:
+    Type: AWS::Cloud9::EnvironmentEC2
+    Properties: 
+      AutomaticStopTimeMinutes: 600
+      Description: "Cloud9 EC2 environment"
+      InstanceType: m5.large
+      Name: "Cloud9EC2Bastion"
+      SubnetId: !ImportValue
+        'Fn::Sub': '${VPCStackName}-PublicSubnetOne'
+      Tags:
+        - Key: 'Purpose'
+          Value: 'Cloud9EC2BastionHostInstance'
+  KafkaProducerEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: m5.large
+      KeyName: !Ref 'KeyName'
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      AvailabilityZone: 
+        Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      SubnetId: !ImportValue
+        'Fn::Sub': '${VPCStackName}-PrivateSubnetMSKOne'
+      SecurityGroupIds: [!GetAtt KafkaClientInstanceSecurityGroup.GroupId]
+      ImageId: !Ref LatestAmiId
+      Tags:
+        - Key: 'Name'
+          Value: 'KafkaProducerInstance'
+      UserData: 
+        Fn::Base64: 
+          !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install python3.7 -y
+            yum install java-1.8.0-openjdk-devel -y
+            yum install nmap-ncat -y
+            yum install git -y
+            yum erase awscli -y
+            yum install jq -y
+            amazon-linux-extras install docker -y
+            service docker start
+            usermod -a -G docker ec2-user
+
+            cd /home/ec2-user
+            wget https://bootstrap.pypa.io/get-pip.py
+            su -c "python3.7 get-pip.py --user" -s /bin/sh ec2-user
+            su -c "/home/ec2-user/.local/bin/pip3 install boto3 --user" -s /bin/sh ec2-user
+            su -c "/home/ec2-user/.local/bin/pip3 install awscli --user" -s /bin/sh ec2-user
+
+            # install AWS CLI 2 - access with aws2
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install -b /usr/local/bin/aws2
+            su -c "ln -s /usr/local/bin/aws2/aws ~/.local/bin/aws2" -s /bin/sh ec2-user
+
+            # Create dirs, get Apache Kafka 2.7.1 and unpack it
+            su -c "mkdir -p kafka271" -s /bin/sh ec2-user
+            cd /home/ec2-user
+            ln -s /home/ec2-user/kafka271 /home/ec2-user/kafka
+            cd kafka271
+            su -c "wget https://apache.mirror.digitalpacific.com.au/kafka/2.7.1/kafka_2.13-2.7.1.tgz" -s /bin/sh ec2-user
+            su -c "tar -xzf kafka_2.13-2.7.1.tgz --strip 1" -s /bin/sh ec2-user
+
+            # Download Kafka Producer code on this EC2 instance
+            su -c "aws s3 cp s3://blogs-uber-jars/kafka-cross-account-gsr-producer.jar /home/ec2-user" -l ec2-user
+  KafkaConsumerEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: m5.large
+      KeyName: !Ref 'KeyName'
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: { Ref: 'AWS::Region' }
+      SubnetId: !ImportValue
+        'Fn::Sub': '${VPCStackName}-PrivateSubnetMSKTwo'
+      SecurityGroupIds: [ !GetAtt KafkaClientInstanceSecurityGroup.GroupId ]
+      ImageId: !Ref LatestAmiId
+      Tags:
+        - Key: 'Name'
+          Value: 'KafkaConsumerInstance'
+      UserData:
+        Fn::Base64:
+          !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install python3.7 -y
+          yum install java-1.8.0-openjdk-devel -y
+          yum install nmap-ncat -y
+          yum install git -y
+          yum erase awscli -y
+          yum install jq -y
+          amazon-linux-extras install docker -y
+          service docker start
+          usermod -a -G docker ec2-user
+
+          cd /home/ec2-user
+          wget https://bootstrap.pypa.io/get-pip.py
+          su -c "python3.7 get-pip.py --user" -s /bin/sh ec2-user
+          su -c "/home/ec2-user/.local/bin/pip3 install boto3 --user" -s /bin/sh ec2-user
+          su -c "/home/ec2-user/.local/bin/pip3 install awscli --user" -s /bin/sh ec2-user
+
+          # install AWS CLI 2 - access with aws2
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          ./aws/install -b /usr/local/bin/aws2
+          su -c "ln -s /usr/local/bin/aws2/aws ~/.local/bin/aws2" -s /bin/sh ec2-user
+
+          # Create dirs, get Apache Kafka 2.7.1 and unpack it
+          su -c "mkdir -p kafka271" -s /bin/sh ec2-user
+          cd /home/ec2-user
+          ln -s /home/ec2-user/kafka271 /home/ec2-user/kafka
+          cd kafka271
+          su -c "wget https://apache.mirror.digitalpacific.com.au/kafka/2.7.1/kafka_2.13-2.7.1.tgz" -s /bin/sh ec2-user
+          su -c "tar -xzf kafka_2.13-2.7.1.tgz --strip 1" -s /bin/sh ec2-user
+
+          # Download Kafka Consumer code on this EC2 instance
+          su -c "aws s3 cp s3://blogs-uber-jars/kafka-cross-account-gsr-consumer.jar /home/ec2-user" -l ec2-user
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      InstanceProfileName: !Join
+                            - '-'
+                            - - 'EC2MMMSKCFProfile'
+                              - !Ref 'AWS::StackName'
+      Roles:
+        - !Ref KafkaProducerConsumerRole
+Outputs:
+  KafkaClientInstanceSecurityGroup:
+    Description: Security Group associated with Kafka Client Instance
+    Value: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+    Export:
+      Name: !Sub "${AWS::StackName}-KafkaClientEC2InstanceSecurityGroupId"
