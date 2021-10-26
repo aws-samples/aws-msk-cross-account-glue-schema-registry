@@ -44,7 +44,7 @@
             <dependency>
                 <groupId>software.amazon.glue</groupId>
                 <artifactId>schema-registry-serde</artifactId>
-                <version>1.1.1</version>
+                <version>1.1.5</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/org.apache.avro/avro -->
             <dependency>
