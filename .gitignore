@@ -1,3 +1,8 @@
-*/target
-.idea
 .DS_Store
+
+#Ignore IntelliJ files
+.idea/
+*.iml
+
+#Ignore Maven files
+**/target
