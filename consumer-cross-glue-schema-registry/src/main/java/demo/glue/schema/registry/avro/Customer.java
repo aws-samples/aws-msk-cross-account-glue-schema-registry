@@ -5,16 +5,17 @@
  */
 package demo.glue.schema.registry.avro;
 
+import org.apache.avro.generic.GenericArray;
 import org.apache.avro.specific.SpecificData;
+import org.apache.avro.util.Utf8;
 import org.apache.avro.message.BinaryMessageEncoder;
 import org.apache.avro.message.BinaryMessageDecoder;
 import org.apache.avro.message.SchemaStore;
 
-@SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class Customer extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   private static final long serialVersionUID = -334695214149819068L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Customer\",\"namespace\":\"demo.glue.schema.registry.avro\",\"fields\":[{\"name\":\"customer_account_no\",\"type\":\"int\",\"doc\":\"customer account number\"},{\"name\":\"first_name\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"middle_name\",\"type\":[\"null\",{\"type\":\"string\",\"avro.java.string\":\"String\"}],\"default\":null},{\"name\":\"last_name\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"email_addresses\",\"type\":[\"null\",{\"type\":\"array\",\"items\":{\"type\":\"string\",\"avro.java.string\":\"String\"}}]},{\"name\":\"customer_address\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"doc\":\"customer address\"},{\"name\":\"mode_of_payment\",\"type\":{\"type\":\"enum\",\"name\":\"ModeOfPayment\",\"symbols\":[\"CARD\",\"CASH\"]},\",default\":\"CARD\"},{\"name\":\"customer_rating\",\"type\":[\"null\",\"int\"],\"default\":null}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Customer\",\"namespace\":\"demo.glue.schema.registry.avro\",\"fields\":[{\"name\":\"customer_account_no\",\"type\":\"int\",\"doc\":\"customer account number\"},{\"name\":\"first_name\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"middle_name\",\"type\":[\"null\",{\"type\":\"string\",\"avro.java.string\":\"String\"}],\"default\":null},{\"name\":\"last_name\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"email_addresses\",\"type\":[\"null\",{\"type\":\"array\",\"items\":{\"type\":\"string\",\"avro.java.string\":\"String\"}}]},{\"name\":\"customer_address\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"doc\":\"customer address\"},{\"name\":\"mode_of_payment\",\"type\":{\"type\":\"enum\",\"name\":\"ModeOfPayment\",\"symbols\":[\"CARD\",\"CASH\"]},\"default\":\"CARD\"},{\"name\":\"customer_rating\",\"type\":[\"null\",\"int\"],\"default\":null}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static SpecificData MODEL$ = new SpecificData();
@@ -26,7 +27,16 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
       new BinaryMessageDecoder<Customer>(MODEL$, SCHEMA$);
 
   /**
+   * Return the BinaryMessageEncoder instance used by this class.
+   * @return the message encoder used by this class
+   */
+  public static BinaryMessageEncoder<Customer> getEncoder() {
+    return ENCODER;
+  }
+
+  /**
    * Return the BinaryMessageDecoder instance used by this class.
+   * @return the message decoder used by this class
    */
   public static BinaryMessageDecoder<Customer> getDecoder() {
     return DECODER;
@@ -35,17 +45,27 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
   /**
    * Create a new BinaryMessageDecoder instance for this class that uses the specified {@link SchemaStore}.
    * @param resolver a {@link SchemaStore} used to find schemas by fingerprint
+   * @return a BinaryMessageDecoder instance for this class backed by the given SchemaStore
    */
   public static BinaryMessageDecoder<Customer> createDecoder(SchemaStore resolver) {
     return new BinaryMessageDecoder<Customer>(MODEL$, SCHEMA$, resolver);
   }
 
-  /** Serializes this Customer to a ByteBuffer. */
+  /**
+   * Serializes this Customer to a ByteBuffer.
+   * @return a buffer holding the serialized data for this instance
+   * @throws java.io.IOException if this instance could not be serialized
+   */
   public java.nio.ByteBuffer toByteBuffer() throws java.io.IOException {
     return ENCODER.encode(this);
   }
 
-  /** Deserializes a Customer from a ByteBuffer. */
+  /**
+   * Deserializes a Customer from a ByteBuffer.
+   * @param b a byte buffer holding serialized data for an instance of this class
+   * @return a Customer instance decoded from the given buffer
+   * @throws java.io.IOException if the given bytes could not be deserialized into an instance of this class
+   */
   public static Customer fromByteBuffer(
       java.nio.ByteBuffer b) throws java.io.IOException {
     return DECODER.decode(b);
@@ -91,6 +111,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
     this.customer_rating = customer_rating;
   }
 
+  public org.apache.avro.specific.SpecificData getSpecificData() { return MODEL$; }
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
   // Used by DatumWriter.  Applications should not call.
   public java.lang.Object get(int field$) {
@@ -103,7 +124,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
     case 5: return customer_address;
     case 6: return mode_of_payment;
     case 7: return customer_rating;
-    default: throw new org.apache.avro.AvroRuntimeException("Bad index");
+    default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
 
@@ -112,14 +133,14 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
     case 0: customer_account_no = (java.lang.Integer)value$; break;
-    case 1: first_name = (java.lang.String)value$; break;
-    case 2: middle_name = (java.lang.String)value$; break;
-    case 3: last_name = (java.lang.String)value$; break;
+    case 1: first_name = value$ != null ? value$.toString() : null; break;
+    case 2: middle_name = value$ != null ? value$.toString() : null; break;
+    case 3: last_name = value$ != null ? value$.toString() : null; break;
     case 4: email_addresses = (java.util.List<java.lang.String>)value$; break;
-    case 5: customer_address = (java.lang.String)value$; break;
+    case 5: customer_address = value$ != null ? value$.toString() : null; break;
     case 6: mode_of_payment = (demo.glue.schema.registry.avro.ModeOfPayment)value$; break;
     case 7: customer_rating = (java.lang.Integer)value$; break;
-    default: throw new org.apache.avro.AvroRuntimeException("Bad index");
+    default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
 
@@ -127,16 +148,17 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
    * Gets the value of the 'customer_account_no' field.
    * @return customer account number
    */
-  public java.lang.Integer getCustomerAccountNo() {
+  public int getCustomerAccountNo() {
     return customer_account_no;
   }
+
 
   /**
    * Sets the value of the 'customer_account_no' field.
    * customer account number
    * @param value the value to set.
    */
-  public void setCustomerAccountNo(java.lang.Integer value) {
+  public void setCustomerAccountNo(int value) {
     this.customer_account_no = value;
   }
 
@@ -147,6 +169,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
   public java.lang.String getFirstName() {
     return first_name;
   }
+
 
   /**
    * Sets the value of the 'first_name' field.
@@ -164,6 +187,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
     return middle_name;
   }
 
+
   /**
    * Sets the value of the 'middle_name' field.
    * @param value the value to set.
@@ -179,6 +203,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
   public java.lang.String getLastName() {
     return last_name;
   }
+
 
   /**
    * Sets the value of the 'last_name' field.
@@ -196,6 +221,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
     return email_addresses;
   }
 
+
   /**
    * Sets the value of the 'email_addresses' field.
    * @param value the value to set.
@@ -211,6 +237,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
   public java.lang.String getCustomerAddress() {
     return customer_address;
   }
+
 
   /**
    * Sets the value of the 'customer_address' field.
@@ -229,6 +256,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
     return mode_of_payment;
   }
 
+
   /**
    * Sets the value of the 'mode_of_payment' field.
    * @param value the value to set.
@@ -244,6 +272,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
   public java.lang.Integer getCustomerRating() {
     return customer_rating;
   }
+
 
   /**
    * Sets the value of the 'customer_rating' field.
@@ -267,7 +296,11 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
    * @return A new Customer RecordBuilder
    */
   public static demo.glue.schema.registry.avro.Customer.Builder newBuilder(demo.glue.schema.registry.avro.Customer.Builder other) {
-    return new demo.glue.schema.registry.avro.Customer.Builder(other);
+    if (other == null) {
+      return new demo.glue.schema.registry.avro.Customer.Builder();
+    } else {
+      return new demo.glue.schema.registry.avro.Customer.Builder(other);
+    }
   }
 
   /**
@@ -276,12 +309,17 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
    * @return A new Customer RecordBuilder
    */
   public static demo.glue.schema.registry.avro.Customer.Builder newBuilder(demo.glue.schema.registry.avro.Customer other) {
-    return new demo.glue.schema.registry.avro.Customer.Builder(other);
+    if (other == null) {
+      return new demo.glue.schema.registry.avro.Customer.Builder();
+    } else {
+      return new demo.glue.schema.registry.avro.Customer.Builder(other);
+    }
   }
 
   /**
    * RecordBuilder for Customer instances.
    */
+  @org.apache.avro.specific.AvroGenerated
   public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<Customer>
     implements org.apache.avro.data.RecordBuilder<Customer> {
 
@@ -309,35 +347,35 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
       super(other);
       if (isValidValue(fields()[0], other.customer_account_no)) {
         this.customer_account_no = data().deepCopy(fields()[0].schema(), other.customer_account_no);
-        fieldSetFlags()[0] = true;
+        fieldSetFlags()[0] = other.fieldSetFlags()[0];
       }
       if (isValidValue(fields()[1], other.first_name)) {
         this.first_name = data().deepCopy(fields()[1].schema(), other.first_name);
-        fieldSetFlags()[1] = true;
+        fieldSetFlags()[1] = other.fieldSetFlags()[1];
       }
       if (isValidValue(fields()[2], other.middle_name)) {
         this.middle_name = data().deepCopy(fields()[2].schema(), other.middle_name);
-        fieldSetFlags()[2] = true;
+        fieldSetFlags()[2] = other.fieldSetFlags()[2];
       }
       if (isValidValue(fields()[3], other.last_name)) {
         this.last_name = data().deepCopy(fields()[3].schema(), other.last_name);
-        fieldSetFlags()[3] = true;
+        fieldSetFlags()[3] = other.fieldSetFlags()[3];
       }
       if (isValidValue(fields()[4], other.email_addresses)) {
         this.email_addresses = data().deepCopy(fields()[4].schema(), other.email_addresses);
-        fieldSetFlags()[4] = true;
+        fieldSetFlags()[4] = other.fieldSetFlags()[4];
       }
       if (isValidValue(fields()[5], other.customer_address)) {
         this.customer_address = data().deepCopy(fields()[5].schema(), other.customer_address);
-        fieldSetFlags()[5] = true;
+        fieldSetFlags()[5] = other.fieldSetFlags()[5];
       }
       if (isValidValue(fields()[6], other.mode_of_payment)) {
         this.mode_of_payment = data().deepCopy(fields()[6].schema(), other.mode_of_payment);
-        fieldSetFlags()[6] = true;
+        fieldSetFlags()[6] = other.fieldSetFlags()[6];
       }
       if (isValidValue(fields()[7], other.customer_rating)) {
         this.customer_rating = data().deepCopy(fields()[7].schema(), other.customer_rating);
-        fieldSetFlags()[7] = true;
+        fieldSetFlags()[7] = other.fieldSetFlags()[7];
       }
     }
 
@@ -346,7 +384,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
      * @param other The existing instance to copy.
      */
     private Builder(demo.glue.schema.registry.avro.Customer other) {
-            super(SCHEMA$);
+      super(SCHEMA$);
       if (isValidValue(fields()[0], other.customer_account_no)) {
         this.customer_account_no = data().deepCopy(fields()[0].schema(), other.customer_account_no);
         fieldSetFlags()[0] = true;
@@ -386,9 +424,10 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
       * customer account number
       * @return The value.
       */
-    public java.lang.Integer getCustomerAccountNo() {
+    public int getCustomerAccountNo() {
       return customer_account_no;
     }
+
 
     /**
       * Sets the value of the 'customer_account_no' field.
@@ -431,6 +470,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
       return first_name;
     }
 
+
     /**
       * Sets the value of the 'first_name' field.
       * @param value The value of 'first_name'.
@@ -469,6 +509,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
     public java.lang.String getMiddleName() {
       return middle_name;
     }
+
 
     /**
       * Sets the value of the 'middle_name' field.
@@ -509,6 +550,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
       return last_name;
     }
 
+
     /**
       * Sets the value of the 'last_name' field.
       * @param value The value of 'last_name'.
@@ -547,6 +589,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
     public java.util.List<java.lang.String> getEmailAddresses() {
       return email_addresses;
     }
+
 
     /**
       * Sets the value of the 'email_addresses' field.
@@ -587,6 +630,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
     public java.lang.String getCustomerAddress() {
       return customer_address;
     }
+
 
     /**
       * Sets the value of the 'customer_address' field.
@@ -630,6 +674,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
       return mode_of_payment;
     }
 
+
     /**
       * Sets the value of the 'mode_of_payment' field.
       * @param value The value of 'mode_of_payment'.
@@ -668,6 +713,7 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
     public java.lang.Integer getCustomerRating() {
       return customer_rating;
     }
+
 
     /**
       * Sets the value of the 'customer_rating' field.
@@ -714,6 +760,8 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
         record.mode_of_payment = fieldSetFlags()[6] ? this.mode_of_payment : (demo.glue.schema.registry.avro.ModeOfPayment) defaultValue(fields()[6]);
         record.customer_rating = fieldSetFlags()[7] ? this.customer_rating : (java.lang.Integer) defaultValue(fields()[7]);
         return record;
+      } catch (org.apache.avro.AvroMissingFieldException e) {
+        throw e;
       } catch (java.lang.Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);
       }
@@ -738,4 +786,184 @@ public class Customer extends org.apache.avro.specific.SpecificRecordBase implem
     READER$.read(this, SpecificData.getDecoder(in));
   }
 
+  @Override protected boolean hasCustomCoders() { return true; }
+
+  @Override public void customEncode(org.apache.avro.io.Encoder out)
+    throws java.io.IOException
+  {
+    out.writeInt(this.customer_account_no);
+
+    out.writeString(this.first_name);
+
+    if (this.middle_name == null) {
+      out.writeIndex(0);
+      out.writeNull();
+    } else {
+      out.writeIndex(1);
+      out.writeString(this.middle_name);
+    }
+
+    out.writeString(this.last_name);
+
+    if (this.email_addresses == null) {
+      out.writeIndex(0);
+      out.writeNull();
+    } else {
+      out.writeIndex(1);
+      long size0 = this.email_addresses.size();
+      out.writeArrayStart();
+      out.setItemCount(size0);
+      long actualSize0 = 0;
+      for (java.lang.String e0: this.email_addresses) {
+        actualSize0++;
+        out.startItem();
+        out.writeString(e0);
+      }
+      out.writeArrayEnd();
+      if (actualSize0 != size0)
+        throw new java.util.ConcurrentModificationException("Array-size written was " + size0 + ", but element count was " + actualSize0 + ".");
+    }
+
+    out.writeString(this.customer_address);
+
+    out.writeEnum(this.mode_of_payment.ordinal());
+
+    if (this.customer_rating == null) {
+      out.writeIndex(0);
+      out.writeNull();
+    } else {
+      out.writeIndex(1);
+      out.writeInt(this.customer_rating);
+    }
+
+  }
+
+  @Override public void customDecode(org.apache.avro.io.ResolvingDecoder in)
+    throws java.io.IOException
+  {
+    org.apache.avro.Schema.Field[] fieldOrder = in.readFieldOrderIfDiff();
+    if (fieldOrder == null) {
+      this.customer_account_no = in.readInt();
+
+      this.first_name = in.readString();
+
+      if (in.readIndex() != 1) {
+        in.readNull();
+        this.middle_name = null;
+      } else {
+        this.middle_name = in.readString();
+      }
+
+      this.last_name = in.readString();
+
+      if (in.readIndex() != 1) {
+        in.readNull();
+        this.email_addresses = null;
+      } else {
+        long size0 = in.readArrayStart();
+        java.util.List<java.lang.String> a0 = this.email_addresses;
+        if (a0 == null) {
+          a0 = new SpecificData.Array<java.lang.String>((int)size0, SCHEMA$.getField("email_addresses").schema().getTypes().get(1));
+          this.email_addresses = a0;
+        } else a0.clear();
+        SpecificData.Array<java.lang.String> ga0 = (a0 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.String>)a0 : null);
+        for ( ; 0 < size0; size0 = in.arrayNext()) {
+          for ( ; size0 != 0; size0--) {
+            java.lang.String e0 = (ga0 != null ? ga0.peek() : null);
+            e0 = in.readString();
+            a0.add(e0);
+          }
+        }
+      }
+
+      this.customer_address = in.readString();
+
+      this.mode_of_payment = demo.glue.schema.registry.avro.ModeOfPayment.values()[in.readEnum()];
+
+      if (in.readIndex() != 1) {
+        in.readNull();
+        this.customer_rating = null;
+      } else {
+        this.customer_rating = in.readInt();
+      }
+
+    } else {
+      for (int i = 0; i < 8; i++) {
+        switch (fieldOrder[i].pos()) {
+        case 0:
+          this.customer_account_no = in.readInt();
+          break;
+
+        case 1:
+          this.first_name = in.readString();
+          break;
+
+        case 2:
+          if (in.readIndex() != 1) {
+            in.readNull();
+            this.middle_name = null;
+          } else {
+            this.middle_name = in.readString();
+          }
+          break;
+
+        case 3:
+          this.last_name = in.readString();
+          break;
+
+        case 4:
+          if (in.readIndex() != 1) {
+            in.readNull();
+            this.email_addresses = null;
+          } else {
+            long size0 = in.readArrayStart();
+            java.util.List<java.lang.String> a0 = this.email_addresses;
+            if (a0 == null) {
+              a0 = new SpecificData.Array<java.lang.String>((int)size0, SCHEMA$.getField("email_addresses").schema().getTypes().get(1));
+              this.email_addresses = a0;
+            } else a0.clear();
+            SpecificData.Array<java.lang.String> ga0 = (a0 instanceof SpecificData.Array ? (SpecificData.Array<java.lang.String>)a0 : null);
+            for ( ; 0 < size0; size0 = in.arrayNext()) {
+              for ( ; size0 != 0; size0--) {
+                java.lang.String e0 = (ga0 != null ? ga0.peek() : null);
+                e0 = in.readString();
+                a0.add(e0);
+              }
+            }
+          }
+          break;
+
+        case 5:
+          this.customer_address = in.readString();
+          break;
+
+        case 6:
+          this.mode_of_payment = demo.glue.schema.registry.avro.ModeOfPayment.values()[in.readEnum()];
+          break;
+
+        case 7:
+          if (in.readIndex() != 1) {
+            in.readNull();
+            this.customer_rating = null;
+          } else {
+            this.customer_rating = in.readInt();
+          }
+          break;
+
+        default:
+          throw new java.io.IOException("Corrupt ResolvingDecoder.");
+        }
+      }
+    }
+  }
 }
+
+
+
+
+
+
+
+
+
+

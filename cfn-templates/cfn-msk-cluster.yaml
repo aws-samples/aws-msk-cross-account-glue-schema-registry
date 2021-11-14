@@ -14,21 +14,18 @@ Metadata:
           - ClusterConfigARN
           - ClusterConfigRevisionNumber
       - Label:
-          default: "Previously created stacks names"
+          default: "Client CloudFormation stack name"
         Parameters:
-          - VPCStackName
-          - KafkaClientStack
+          - ClientStackName
     ParameterLabels:
       MSKKafkaVersion:
         default: "MSK version, using only 2.7.1"
       ClusterConfigARN:
-        default: "MSK Cluster configuration ARN"
+        default: "MSK Cluster configuration Arn"
       ClusterConfigRevisionNumber:
         default: "MSK Cluster configuration revision number"
-      VPCStackName:
-        default: "Name of an VPC Stack that you created earlier"
-      KafkaClientStack:
-        default: "Name of Kafka Producer Consumer Stack stack that you created earlier"
+      ClientStackName:
+        default: "Client stack name that you created earlier"
 Parameters:
   MSKKafkaVersion:
     Type: String
@@ -37,16 +34,12 @@ Parameters:
       - 2.7.1
   ClusterConfigARN:
     Type: String
-    Default: "arn:aws:kafka:ap-southeast-2:<Account-A ID>:configuration/msk-configuration/xxxxxxxxxxxxxxxxxxx"
   ClusterConfigRevisionNumber:
     Type: Number
     Default: 1
-  VPCStackName:
+  ClientStackName:
     Type: String
-    Default: "MSKVPCStack"
-  KafkaClientStack:
-    Type: String
-    Default: "KafkaProducerConsumerStack"
+    Default: "MSKClientStack"
 Resources:
   MSKSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -54,34 +47,37 @@ Resources:
       GroupDescription: MSK Security Group
       VpcId:
         Fn::ImportValue:
-          !Sub "${VPCStackName}-VPCID"
+          !Sub "${ClientStackName}-VPCId"
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 2181
-          ToPort: 2181
-          SourceSecurityGroupId:
-            Fn::ImportValue:
-              !Sub "${KafkaClientStack}-KafkaClientEC2InstanceSecurityGroupId"
-        - IpProtocol: tcp
-          FromPort: 9092
-          ToPort: 9092
-          SourceSecurityGroupId:
-            Fn::ImportValue:
-              !Sub "${KafkaClientStack}-KafkaClientEC2InstanceSecurityGroupId"
+      - Description: allows 2181 (MSK Zookeeper) access from security group associated with Kafka clients EC2 instances
+        IpProtocol: tcp
+        FromPort: 2181
+        ToPort: 2181
+        SourceSecurityGroupId:
+          Fn::ImportValue:
+            !Sub "${ClientStackName}-KafkaClientEC2InstanceSecurityGroupId"
+      - Description: allows 9092 (MSK plaintext) access from security group associated with Kafka clients EC2 instances
+        IpProtocol: tcp
+        FromPort: 9092
+        ToPort: 9092
+        SourceSecurityGroupId:
+          Fn::ImportValue:
+            !Sub "${ClientStackName}-KafkaClientEC2InstanceSecurityGroupId"
       SecurityGroupEgress:
-        - IpProtocol: -1
-          CidrIp: 0.0.0.0/0
+      - Description: all egress allowed
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0
   MSKCluster:
     Type: AWS::MSK::Cluster
     Properties:
       BrokerNodeGroupInfo:
         ClientSubnets:
           - Fn::ImportValue:
-              !Sub "${VPCStackName}-PrivateSubnetMSKOne"
+              !Sub "${ClientStackName}-PrivateSubnetMSKOne"
           - Fn::ImportValue:
-              !Sub "${VPCStackName}-PrivateSubnetMSKTwo"
+              !Sub "${ClientStackName}-PrivateSubnetMSKTwo"
           - Fn::ImportValue:
-              !Sub "${VPCStackName}-PrivateSubnetMSKThree"
+              !Sub "${ClientStackName}-PrivateSubnetMSKThree"
         InstanceType: kafka.m5.large
         SecurityGroups: [!GetAtt MSKSecurityGroup.GroupId]
         StorageInfo:
@@ -101,3 +97,9 @@ Resources:
       EnhancedMonitoring: PER_TOPIC_PER_BROKER
       KafkaVersion: !Ref MSKKafkaVersion
       NumberOfBrokerNodes: 3
+Outputs:
+  MSKClusterArn:
+    Description: MSK Cluster Arn
+    Value: !Ref MSKCluster
+    Export:
+      Name: !Sub "${AWS::StackName}-ClusterArn"

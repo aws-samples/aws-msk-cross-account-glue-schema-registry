@@ -9,49 +9,119 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: "Amazon MSK clients configuration parameters"
+          default: "VPC and subnets configuration"
         Parameters:
-          - VPCStackName
-          - KeyName
+          - VPCCidr
+          - PublicSubnetCidr
+          - PrivateSubnetFirstCidr
+          - PrivateSubnetSecondCidr
+          - PrivateSubnetThirdCidr
+      - Label:
+          default: "EC2 instances configuration"
+        Parameters:
+          - EC2KeyPairName
           - LatestAmiId
-          - KafkaProducerConsumerRole
+      - Label:
+          default: "Cross Account IAM Role Arn"
+        Parameters:
+          - CrossAccountGlueSchemaRegistryRoleArn
     ParameterLabels:
-      VPCStackName:
-        default: "Name of an VPC Stack created prior to this stack"
-      KeyName:
-        default: "Name of an existing EC2 KeyPair to enable SSH access to the instances"
+      VPCCidr:
+        default: "VPC CIDR address"
+      PublicSubnetCidr:
+        default: "Public subnet CIDR address"
+      PrivateSubnetFirstCidr:
+        default: "First private subnet CIDR address"
+      PrivateSubnetSecondCidr:
+        default: "Second private subnet CIDR address"
+      PrivateSubnetThirdCidr:
+        default: "Third private subnet CIDR address"
+      EC2KeyPairName:
+        default: "EC2 Keypair to enable SSH access to the instances created through this template"
       LatestAmiId:
         default: "Latest EC2 AMI id"
-      KafkaProducerConsumerRole:
-        default: "IAM role name which allows Producer and Consumer instances to assume role in AWS Glue Schema Registry account"
+      CrossAccountGlueSchemaRegistryRoleArn:
+        default: >
+          IAM Role Arn from schema registry AWS Account. Role created by the CloudFormation template in a separate AWS Account.
+        Type: String
 Parameters:
-  VPCStackName:
+  VPCCidr:
     Type: String
-    Default: MSKVPCStack
-  KeyName:
+    Default: '10.0.0.0/16'
+  PublicSubnetCidr:
+    Type: String
+    Default: '10.0.0.0/24'
+  PrivateSubnetFirstCidr:
+    Type: String
+    Default: '10.0.1.0/24'
+  PrivateSubnetSecondCidr:
+    Type: String
+    Default: '10.0.2.0/24'
+  PrivateSubnetThirdCidr:
+    Type: String
+    Default: '10.0.3.0/24'
+  EC2KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
     ConstraintDescription: Can contain only ASCII characters.
   LatestAmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
-  KafkaProducerConsumerRole:
+  CrossAccountGlueSchemaRegistryRoleArn:
     Type: String
-    Default: "KafkaProducerConsumerRole"
 Resources:
+  MSKVPCStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: "https://blogs-cf-template.s3.ap-southeast-2.amazonaws.com/cfn-vpc.yaml"
+      Parameters:
+        VPCCidr: !Ref VPCCidr
+        PublicSubnetCidr: !Ref PublicSubnetCidr
+        PrivateSubnetFirstCidr: !Ref PrivateSubnetFirstCidr
+        PrivateSubnetSecondCidr: !Ref PrivateSubnetSecondCidr
+        PrivateSubnetThirdCidr: !Ref PrivateSubnetThirdCidr
+  KafkaProducerConsumerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonMSKReadOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+      Policies:
+        - PolicyName: allow-cross-account-gsr-access-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: "sts:AssumeRole"
+                Resource: !Ref 'CrossAccountGlueSchemaRegistryRoleArn'
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref 'KafkaProducerConsumerRole'
   KafkaClientInstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable SSH access via port 22 from BastionHostSecurityGroup
-      VpcId: !ImportValue
-        'Fn::Sub': '${VPCStackName}-VPCID'
+      VpcId: !GetAtt MSKVPCStack.Outputs.VPCId
       SecurityGroupIngress:
-      - IpProtocol: tcp
+      - Description: ssh access from Cloud9 environment in VPC public subnet
+        IpProtocol: tcp
         FromPort: 22
         ToPort: 22
-        CidrIp: !ImportValue
-          'Fn::Sub': '${VPCStackName}-PublicSubnetCidr'
+        CidrIp: !Ref PublicSubnetCidr
       SecurityGroupEgress:
-      - IpProtocol: -1
+      - Description: all egress allowed
+        IpProtocol: -1
         CidrIp: 0.0.0.0/0
   Cloud9EC2Bastion:
     Type: AWS::Cloud9::EnvironmentEC2
@@ -60,8 +130,7 @@ Resources:
       Description: "Cloud9 EC2 environment"
       InstanceType: m5.large
       Name: "Cloud9EC2Bastion"
-      SubnetId: !ImportValue
-        'Fn::Sub': '${VPCStackName}-PublicSubnetOne'
+      SubnetId: !GetAtt MSKVPCStack.Outputs.PublicSubnetOne
       Tags:
         - Key: 'Purpose'
           Value: 'Cloud9EC2BastionHostInstance'
@@ -69,14 +138,13 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: m5.large
-      KeyName: !Ref 'KeyName'
+      KeyName: !Ref 'EC2KeyPairName'
       IamInstanceProfile: !Ref EC2InstanceProfile
       AvailabilityZone: 
         Fn::Select:
          - 0
          - Fn::GetAZs: {Ref: 'AWS::Region'}
-      SubnetId: !ImportValue
-        'Fn::Sub': '${VPCStackName}-PrivateSubnetMSKOne'
+      SubnetId: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKOne
       SecurityGroupIds: [!GetAtt KafkaClientInstanceSecurityGroup.GroupId]
       ImageId: !Ref LatestAmiId
       Tags:
@@ -123,14 +191,13 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: m5.large
-      KeyName: !Ref 'KeyName'
+      KeyName: !Ref 'EC2KeyPairName'
       IamInstanceProfile: !Ref EC2InstanceProfile
       AvailabilityZone:
         Fn::Select:
           - 1
           - Fn::GetAZs: { Ref: 'AWS::Region' }
-      SubnetId: !ImportValue
-        'Fn::Sub': '${VPCStackName}-PrivateSubnetMSKTwo'
+      SubnetId: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKTwo
       SecurityGroupIds: [ !GetAtt KafkaClientInstanceSecurityGroup.GroupId ]
       ImageId: !Ref LatestAmiId
       Tags:
@@ -173,16 +240,37 @@ Resources:
 
           # Download Kafka Consumer code on this EC2 instance
           su -c "aws s3 cp s3://blogs-uber-jars/kafka-cross-account-gsr-consumer.jar /home/ec2-user" -l ec2-user
-  EC2InstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties: 
-      InstanceProfileName: !Join
-                            - '-'
-                            - - 'EC2MMMSKCFProfile'
-                              - !Ref 'AWS::StackName'
-      Roles:
-        - !Ref KafkaProducerConsumerRole
 Outputs:
+  VPCId:
+    Description: The ID of the VPC created
+    Value: !GetAtt MSKVPCStack.Outputs.VPCId
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCId"
+  PublicSubnetCidr:
+    Description: Public subnet CIDR address
+    Value: !GetAtt MSKVPCStack.Outputs.PublicSubnetCidr
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnetCidr"
+  PublicSubnetOne:
+    Description: The ID of the public subnet created
+    Value: !GetAtt MSKVPCStack.Outputs.PublicSubnetOne
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnetOne"
+  PrivateSubnetMSKOne:
+    Description: The ID of private subnet one created
+    Value: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKOne
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetMSKOne"
+  PrivateSubnetMSKTwo:
+    Description: The ID of private subnet two created
+    Value: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKTwo
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetMSKTwo"
+  PrivateSubnetMSKThree:
+    Description: The ID of private subnet three created
+    Value: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKThree
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetMSKThree"
   KafkaClientInstanceSecurityGroup:
     Description: Security Group associated with Kafka Client Instance
     Value: !GetAtt KafkaClientInstanceSecurityGroup.GroupId

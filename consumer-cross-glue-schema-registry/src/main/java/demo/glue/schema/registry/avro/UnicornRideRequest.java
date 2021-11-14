@@ -5,16 +5,17 @@
  */
 package demo.glue.schema.registry.avro;
 
+import org.apache.avro.generic.GenericArray;
 import org.apache.avro.specific.SpecificData;
+import org.apache.avro.util.Utf8;
 import org.apache.avro.message.BinaryMessageEncoder;
 import org.apache.avro.message.BinaryMessageDecoder;
 import org.apache.avro.message.SchemaStore;
 
-@SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   private static final long serialVersionUID = 7071685435420298014L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"UnicornRideRequest\",\"namespace\":\"demo.glue.schema.registry.avro\",\"fields\":[{\"name\":\"request_id\",\"type\":\"int\",\"doc\":\"customer request id\"},{\"name\":\"pickup_address\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"doc\":\"customer pickup address\"},{\"name\":\"destination_address\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"doc\":\"customer destination address\"},{\"name\":\"ride_fare\",\"type\":\"float\",\"doc\":\"ride fare amount (USD)\"},{\"name\":\"ride_duration\",\"type\":\"int\",\"doc\":\"ride duration in minutes\"},{\"name\":\"preferred_unicorn_color\",\"type\":{\"type\":\"enum\",\"name\":\"UnicornPreferredColor\",\"symbols\":[\"WHITE\",\"BLACK\",\"RED\",\"BLUE\",\"GREY\"]},\"default\":\"WHITE\"},{\"name\":\"recommended_unicorn\",\"type\":{\"type\":\"record\",\"name\":\"RecommendedUnicorn\",\"fields\":[{\"name\":\"unicorn_id\",\"type\":\"int\",\"doc\":\"recommended unicorn id\"},{\"name\":\"color\",\"type\":{\"type\":\"enum\",\"name\":\"unicorn_color\",\"symbols\":[\"WHITE\",\"RED\",\"BLUE\"]}},{\"name\":\"stars_rating\",\"type\":[\"null\",\"int\"],\"doc\":\"unicorn star ratings based on customers feedback\",\"default\":null}]}},{\"name\":\"customer\",\"type\":{\"type\":\"record\",\"name\":\"Customer\",\"fields\":[{\"name\":\"customer_account_no\",\"type\":\"int\",\"doc\":\"customer account number\"},{\"name\":\"first_name\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"middle_name\",\"type\":[\"null\",{\"type\":\"string\",\"avro.java.string\":\"String\"}],\"default\":null},{\"name\":\"last_name\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"email_addresses\",\"type\":[\"null\",{\"type\":\"array\",\"items\":{\"type\":\"string\",\"avro.java.string\":\"String\"}}]},{\"name\":\"customer_address\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"doc\":\"customer address\"},{\"name\":\"mode_of_payment\",\"type\":{\"type\":\"enum\",\"name\":\"ModeOfPayment\",\"symbols\":[\"CARD\",\"CASH\"]},\",default\":\"CARD\"},{\"name\":\"customer_rating\",\"type\":[\"null\",\"int\"],\"default\":null}]}}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"UnicornRideRequest\",\"namespace\":\"demo.glue.schema.registry.avro\",\"fields\":[{\"name\":\"request_id\",\"type\":\"int\",\"doc\":\"customer request id\"},{\"name\":\"pickup_address\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"doc\":\"customer pickup address\"},{\"name\":\"destination_address\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"doc\":\"customer destination address\"},{\"name\":\"ride_fare\",\"type\":\"float\",\"doc\":\"ride fare amount (USD)\"},{\"name\":\"ride_duration\",\"type\":\"int\",\"doc\":\"ride duration in minutes\"},{\"name\":\"preferred_unicorn_color\",\"type\":{\"type\":\"enum\",\"name\":\"UnicornPreferredColor\",\"symbols\":[\"WHITE\",\"BLACK\",\"RED\",\"BLUE\",\"GREY\"]},\"default\":\"WHITE\"},{\"name\":\"recommended_unicorn\",\"type\":{\"type\":\"record\",\"name\":\"RecommendedUnicorn\",\"fields\":[{\"name\":\"unicorn_id\",\"type\":\"int\",\"doc\":\"recommended unicorn id\"},{\"name\":\"color\",\"type\":{\"type\":\"enum\",\"name\":\"unicorn_color\",\"symbols\":[\"WHITE\",\"RED\",\"BLUE\"]}},{\"name\":\"stars_rating\",\"type\":[\"null\",\"int\"],\"doc\":\"unicorn star ratings based on customers feedback\",\"default\":null}]}},{\"name\":\"customer\",\"type\":{\"type\":\"record\",\"name\":\"Customer\",\"fields\":[{\"name\":\"customer_account_no\",\"type\":\"int\",\"doc\":\"customer account number\"},{\"name\":\"first_name\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"middle_name\",\"type\":[\"null\",{\"type\":\"string\",\"avro.java.string\":\"String\"}],\"default\":null},{\"name\":\"last_name\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"email_addresses\",\"type\":[\"null\",{\"type\":\"array\",\"items\":{\"type\":\"string\",\"avro.java.string\":\"String\"}}]},{\"name\":\"customer_address\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"doc\":\"customer address\"},{\"name\":\"mode_of_payment\",\"type\":{\"type\":\"enum\",\"name\":\"ModeOfPayment\",\"symbols\":[\"CARD\",\"CASH\"]},\"default\":\"CARD\"},{\"name\":\"customer_rating\",\"type\":[\"null\",\"int\"],\"default\":null}]}}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static SpecificData MODEL$ = new SpecificData();
@@ -26,7 +27,16 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
       new BinaryMessageDecoder<UnicornRideRequest>(MODEL$, SCHEMA$);
 
   /**
+   * Return the BinaryMessageEncoder instance used by this class.
+   * @return the message encoder used by this class
+   */
+  public static BinaryMessageEncoder<UnicornRideRequest> getEncoder() {
+    return ENCODER;
+  }
+
+  /**
    * Return the BinaryMessageDecoder instance used by this class.
+   * @return the message decoder used by this class
    */
   public static BinaryMessageDecoder<UnicornRideRequest> getDecoder() {
     return DECODER;
@@ -35,17 +45,27 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
   /**
    * Create a new BinaryMessageDecoder instance for this class that uses the specified {@link SchemaStore}.
    * @param resolver a {@link SchemaStore} used to find schemas by fingerprint
+   * @return a BinaryMessageDecoder instance for this class backed by the given SchemaStore
    */
   public static BinaryMessageDecoder<UnicornRideRequest> createDecoder(SchemaStore resolver) {
     return new BinaryMessageDecoder<UnicornRideRequest>(MODEL$, SCHEMA$, resolver);
   }
 
-  /** Serializes this UnicornRideRequest to a ByteBuffer. */
+  /**
+   * Serializes this UnicornRideRequest to a ByteBuffer.
+   * @return a buffer holding the serialized data for this instance
+   * @throws java.io.IOException if this instance could not be serialized
+   */
   public java.nio.ByteBuffer toByteBuffer() throws java.io.IOException {
     return ENCODER.encode(this);
   }
 
-  /** Deserializes a UnicornRideRequest from a ByteBuffer. */
+  /**
+   * Deserializes a UnicornRideRequest from a ByteBuffer.
+   * @param b a byte buffer holding serialized data for an instance of this class
+   * @return a UnicornRideRequest instance decoded from the given buffer
+   * @throws java.io.IOException if the given bytes could not be deserialized into an instance of this class
+   */
   public static UnicornRideRequest fromByteBuffer(
       java.nio.ByteBuffer b) throws java.io.IOException {
     return DECODER.decode(b);
@@ -94,6 +114,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
     this.customer = customer;
   }
 
+  public org.apache.avro.specific.SpecificData getSpecificData() { return MODEL$; }
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
   // Used by DatumWriter.  Applications should not call.
   public java.lang.Object get(int field$) {
@@ -106,7 +127,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
     case 5: return preferred_unicorn_color;
     case 6: return recommended_unicorn;
     case 7: return customer;
-    default: throw new org.apache.avro.AvroRuntimeException("Bad index");
+    default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
 
@@ -115,14 +136,14 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
     case 0: request_id = (java.lang.Integer)value$; break;
-    case 1: pickup_address = (java.lang.String)value$; break;
-    case 2: destination_address = (java.lang.String)value$; break;
+    case 1: pickup_address = value$ != null ? value$.toString() : null; break;
+    case 2: destination_address = value$ != null ? value$.toString() : null; break;
     case 3: ride_fare = (java.lang.Float)value$; break;
     case 4: ride_duration = (java.lang.Integer)value$; break;
     case 5: preferred_unicorn_color = (demo.glue.schema.registry.avro.UnicornPreferredColor)value$; break;
     case 6: recommended_unicorn = (demo.glue.schema.registry.avro.RecommendedUnicorn)value$; break;
     case 7: customer = (demo.glue.schema.registry.avro.Customer)value$; break;
-    default: throw new org.apache.avro.AvroRuntimeException("Bad index");
+    default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
 
@@ -130,16 +151,17 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
    * Gets the value of the 'request_id' field.
    * @return customer request id
    */
-  public java.lang.Integer getRequestId() {
+  public int getRequestId() {
     return request_id;
   }
+
 
   /**
    * Sets the value of the 'request_id' field.
    * customer request id
    * @param value the value to set.
    */
-  public void setRequestId(java.lang.Integer value) {
+  public void setRequestId(int value) {
     this.request_id = value;
   }
 
@@ -150,6 +172,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
   public java.lang.String getPickupAddress() {
     return pickup_address;
   }
+
 
   /**
    * Sets the value of the 'pickup_address' field.
@@ -168,6 +191,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
     return destination_address;
   }
 
+
   /**
    * Sets the value of the 'destination_address' field.
    * customer destination address
@@ -181,16 +205,17 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
    * Gets the value of the 'ride_fare' field.
    * @return ride fare amount (USD)
    */
-  public java.lang.Float getRideFare() {
+  public float getRideFare() {
     return ride_fare;
   }
+
 
   /**
    * Sets the value of the 'ride_fare' field.
    * ride fare amount (USD)
    * @param value the value to set.
    */
-  public void setRideFare(java.lang.Float value) {
+  public void setRideFare(float value) {
     this.ride_fare = value;
   }
 
@@ -198,16 +223,17 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
    * Gets the value of the 'ride_duration' field.
    * @return ride duration in minutes
    */
-  public java.lang.Integer getRideDuration() {
+  public int getRideDuration() {
     return ride_duration;
   }
+
 
   /**
    * Sets the value of the 'ride_duration' field.
    * ride duration in minutes
    * @param value the value to set.
    */
-  public void setRideDuration(java.lang.Integer value) {
+  public void setRideDuration(int value) {
     this.ride_duration = value;
   }
 
@@ -218,6 +244,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
   public demo.glue.schema.registry.avro.UnicornPreferredColor getPreferredUnicornColor() {
     return preferred_unicorn_color;
   }
+
 
   /**
    * Sets the value of the 'preferred_unicorn_color' field.
@@ -235,6 +262,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
     return recommended_unicorn;
   }
 
+
   /**
    * Sets the value of the 'recommended_unicorn' field.
    * @param value the value to set.
@@ -250,6 +278,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
   public demo.glue.schema.registry.avro.Customer getCustomer() {
     return customer;
   }
+
 
   /**
    * Sets the value of the 'customer' field.
@@ -273,7 +302,11 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
    * @return A new UnicornRideRequest RecordBuilder
    */
   public static demo.glue.schema.registry.avro.UnicornRideRequest.Builder newBuilder(demo.glue.schema.registry.avro.UnicornRideRequest.Builder other) {
-    return new demo.glue.schema.registry.avro.UnicornRideRequest.Builder(other);
+    if (other == null) {
+      return new demo.glue.schema.registry.avro.UnicornRideRequest.Builder();
+    } else {
+      return new demo.glue.schema.registry.avro.UnicornRideRequest.Builder(other);
+    }
   }
 
   /**
@@ -282,12 +315,17 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
    * @return A new UnicornRideRequest RecordBuilder
    */
   public static demo.glue.schema.registry.avro.UnicornRideRequest.Builder newBuilder(demo.glue.schema.registry.avro.UnicornRideRequest other) {
-    return new demo.glue.schema.registry.avro.UnicornRideRequest.Builder(other);
+    if (other == null) {
+      return new demo.glue.schema.registry.avro.UnicornRideRequest.Builder();
+    } else {
+      return new demo.glue.schema.registry.avro.UnicornRideRequest.Builder(other);
+    }
   }
 
   /**
    * RecordBuilder for UnicornRideRequest instances.
    */
+  @org.apache.avro.specific.AvroGenerated
   public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<UnicornRideRequest>
     implements org.apache.avro.data.RecordBuilder<UnicornRideRequest> {
 
@@ -320,38 +358,38 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
       super(other);
       if (isValidValue(fields()[0], other.request_id)) {
         this.request_id = data().deepCopy(fields()[0].schema(), other.request_id);
-        fieldSetFlags()[0] = true;
+        fieldSetFlags()[0] = other.fieldSetFlags()[0];
       }
       if (isValidValue(fields()[1], other.pickup_address)) {
         this.pickup_address = data().deepCopy(fields()[1].schema(), other.pickup_address);
-        fieldSetFlags()[1] = true;
+        fieldSetFlags()[1] = other.fieldSetFlags()[1];
       }
       if (isValidValue(fields()[2], other.destination_address)) {
         this.destination_address = data().deepCopy(fields()[2].schema(), other.destination_address);
-        fieldSetFlags()[2] = true;
+        fieldSetFlags()[2] = other.fieldSetFlags()[2];
       }
       if (isValidValue(fields()[3], other.ride_fare)) {
         this.ride_fare = data().deepCopy(fields()[3].schema(), other.ride_fare);
-        fieldSetFlags()[3] = true;
+        fieldSetFlags()[3] = other.fieldSetFlags()[3];
       }
       if (isValidValue(fields()[4], other.ride_duration)) {
         this.ride_duration = data().deepCopy(fields()[4].schema(), other.ride_duration);
-        fieldSetFlags()[4] = true;
+        fieldSetFlags()[4] = other.fieldSetFlags()[4];
       }
       if (isValidValue(fields()[5], other.preferred_unicorn_color)) {
         this.preferred_unicorn_color = data().deepCopy(fields()[5].schema(), other.preferred_unicorn_color);
-        fieldSetFlags()[5] = true;
+        fieldSetFlags()[5] = other.fieldSetFlags()[5];
       }
       if (isValidValue(fields()[6], other.recommended_unicorn)) {
         this.recommended_unicorn = data().deepCopy(fields()[6].schema(), other.recommended_unicorn);
-        fieldSetFlags()[6] = true;
+        fieldSetFlags()[6] = other.fieldSetFlags()[6];
       }
       if (other.hasRecommendedUnicornBuilder()) {
         this.recommended_unicornBuilder = demo.glue.schema.registry.avro.RecommendedUnicorn.newBuilder(other.getRecommendedUnicornBuilder());
       }
       if (isValidValue(fields()[7], other.customer)) {
         this.customer = data().deepCopy(fields()[7].schema(), other.customer);
-        fieldSetFlags()[7] = true;
+        fieldSetFlags()[7] = other.fieldSetFlags()[7];
       }
       if (other.hasCustomerBuilder()) {
         this.customerBuilder = demo.glue.schema.registry.avro.Customer.newBuilder(other.getCustomerBuilder());
@@ -363,7 +401,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
      * @param other The existing instance to copy.
      */
     private Builder(demo.glue.schema.registry.avro.UnicornRideRequest other) {
-            super(SCHEMA$);
+      super(SCHEMA$);
       if (isValidValue(fields()[0], other.request_id)) {
         this.request_id = data().deepCopy(fields()[0].schema(), other.request_id);
         fieldSetFlags()[0] = true;
@@ -405,9 +443,10 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
       * customer request id
       * @return The value.
       */
-    public java.lang.Integer getRequestId() {
+    public int getRequestId() {
       return request_id;
     }
+
 
     /**
       * Sets the value of the 'request_id' field.
@@ -450,6 +489,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
     public java.lang.String getPickupAddress() {
       return pickup_address;
     }
+
 
     /**
       * Sets the value of the 'pickup_address' field.
@@ -494,6 +534,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
       return destination_address;
     }
 
+
     /**
       * Sets the value of the 'destination_address' field.
       * customer destination address
@@ -533,9 +574,10 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
       * ride fare amount (USD)
       * @return The value.
       */
-    public java.lang.Float getRideFare() {
+    public float getRideFare() {
       return ride_fare;
     }
+
 
     /**
       * Sets the value of the 'ride_fare' field.
@@ -575,9 +617,10 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
       * ride duration in minutes
       * @return The value.
       */
-    public java.lang.Integer getRideDuration() {
+    public int getRideDuration() {
       return ride_duration;
     }
+
 
     /**
       * Sets the value of the 'ride_duration' field.
@@ -620,6 +663,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
       return preferred_unicorn_color;
     }
 
+
     /**
       * Sets the value of the 'preferred_unicorn_color' field.
       * @param value The value of 'preferred_unicorn_color'.
@@ -658,6 +702,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
     public demo.glue.schema.registry.avro.RecommendedUnicorn getRecommendedUnicorn() {
       return recommended_unicorn;
     }
+
 
     /**
       * Sets the value of the 'recommended_unicorn' field.
@@ -700,6 +745,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
      * @param value The builder instance that must be set.
      * @return This builder.
      */
+
     public demo.glue.schema.registry.avro.UnicornRideRequest.Builder setRecommendedUnicornBuilder(demo.glue.schema.registry.avro.RecommendedUnicorn.Builder value) {
       clearRecommendedUnicorn();
       recommended_unicornBuilder = value;
@@ -732,6 +778,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
     public demo.glue.schema.registry.avro.Customer getCustomer() {
       return customer;
     }
+
 
     /**
       * Sets the value of the 'customer' field.
@@ -774,6 +821,7 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
      * @param value The builder instance that must be set.
      * @return This builder.
      */
+
     public demo.glue.schema.registry.avro.UnicornRideRequest.Builder setCustomerBuilder(demo.glue.schema.registry.avro.Customer.Builder value) {
       clearCustomer();
       customerBuilder = value;
@@ -811,16 +859,28 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
         record.ride_duration = fieldSetFlags()[4] ? this.ride_duration : (java.lang.Integer) defaultValue(fields()[4]);
         record.preferred_unicorn_color = fieldSetFlags()[5] ? this.preferred_unicorn_color : (demo.glue.schema.registry.avro.UnicornPreferredColor) defaultValue(fields()[5]);
         if (recommended_unicornBuilder != null) {
-          record.recommended_unicorn = this.recommended_unicornBuilder.build();
+          try {
+            record.recommended_unicorn = this.recommended_unicornBuilder.build();
+          } catch (org.apache.avro.AvroMissingFieldException e) {
+            e.addParentField(record.getSchema().getField("recommended_unicorn"));
+            throw e;
+          }
         } else {
           record.recommended_unicorn = fieldSetFlags()[6] ? this.recommended_unicorn : (demo.glue.schema.registry.avro.RecommendedUnicorn) defaultValue(fields()[6]);
         }
         if (customerBuilder != null) {
-          record.customer = this.customerBuilder.build();
+          try {
+            record.customer = this.customerBuilder.build();
+          } catch (org.apache.avro.AvroMissingFieldException e) {
+            e.addParentField(record.getSchema().getField("customer"));
+            throw e;
+          }
         } else {
           record.customer = fieldSetFlags()[7] ? this.customer : (demo.glue.schema.registry.avro.Customer) defaultValue(fields()[7]);
         }
         return record;
+      } catch (org.apache.avro.AvroMissingFieldException e) {
+        throw e;
       } catch (java.lang.Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);
       }
@@ -845,4 +905,111 @@ public class UnicornRideRequest extends org.apache.avro.specific.SpecificRecordB
     READER$.read(this, SpecificData.getDecoder(in));
   }
 
+  @Override protected boolean hasCustomCoders() { return true; }
+
+  @Override public void customEncode(org.apache.avro.io.Encoder out)
+    throws java.io.IOException
+  {
+    out.writeInt(this.request_id);
+
+    out.writeString(this.pickup_address);
+
+    out.writeString(this.destination_address);
+
+    out.writeFloat(this.ride_fare);
+
+    out.writeInt(this.ride_duration);
+
+    out.writeEnum(this.preferred_unicorn_color.ordinal());
+
+    this.recommended_unicorn.customEncode(out);
+
+    this.customer.customEncode(out);
+
+  }
+
+  @Override public void customDecode(org.apache.avro.io.ResolvingDecoder in)
+    throws java.io.IOException
+  {
+    org.apache.avro.Schema.Field[] fieldOrder = in.readFieldOrderIfDiff();
+    if (fieldOrder == null) {
+      this.request_id = in.readInt();
+
+      this.pickup_address = in.readString();
+
+      this.destination_address = in.readString();
+
+      this.ride_fare = in.readFloat();
+
+      this.ride_duration = in.readInt();
+
+      this.preferred_unicorn_color = demo.glue.schema.registry.avro.UnicornPreferredColor.values()[in.readEnum()];
+
+      if (this.recommended_unicorn == null) {
+        this.recommended_unicorn = new demo.glue.schema.registry.avro.RecommendedUnicorn();
+      }
+      this.recommended_unicorn.customDecode(in);
+
+      if (this.customer == null) {
+        this.customer = new demo.glue.schema.registry.avro.Customer();
+      }
+      this.customer.customDecode(in);
+
+    } else {
+      for (int i = 0; i < 8; i++) {
+        switch (fieldOrder[i].pos()) {
+        case 0:
+          this.request_id = in.readInt();
+          break;
+
+        case 1:
+          this.pickup_address = in.readString();
+          break;
+
+        case 2:
+          this.destination_address = in.readString();
+          break;
+
+        case 3:
+          this.ride_fare = in.readFloat();
+          break;
+
+        case 4:
+          this.ride_duration = in.readInt();
+          break;
+
+        case 5:
+          this.preferred_unicorn_color = demo.glue.schema.registry.avro.UnicornPreferredColor.values()[in.readEnum()];
+          break;
+
+        case 6:
+          if (this.recommended_unicorn == null) {
+            this.recommended_unicorn = new demo.glue.schema.registry.avro.RecommendedUnicorn();
+          }
+          this.recommended_unicorn.customDecode(in);
+          break;
+
+        case 7:
+          if (this.customer == null) {
+            this.customer = new demo.glue.schema.registry.avro.Customer();
+          }
+          this.customer.customDecode(in);
+          break;
+
+        default:
+          throw new java.io.IOException("Corrupt ResolvingDecoder.");
+        }
+      }
+    }
+  }
 }
+
+
+
+
+
+
+
+
+
+

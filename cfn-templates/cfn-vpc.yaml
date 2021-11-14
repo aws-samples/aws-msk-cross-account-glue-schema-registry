@@ -3,28 +3,6 @@ Description: >
   **WARNING** This template creates VPC, Subnets, NATGateway
   and related resources. You will be billed for the AWS resources
   used if you create a stack from this template.
-Metadata:
-  AWS::CloudFormation::Interface:
-    ParameterGroups:
-      - Label:
-          default: "Network Configuration (change CIDR address ranges according to your network requirements)"
-        Parameters:
-          - VPCCidr
-          - PublicSubnetCidr
-          - PrivateSubnetFirstCidr
-          - PrivateSubnetSecondCidr
-          - PrivateSubnetThirdCidr
-    ParameterLabels:
-      VPCCidr:
-        default: "VPC CIDR address"
-      PublicSubnetCidr:
-        default: "Public subnet CIDR address"
-      PrivateSubnetFirstCidr:
-        default: "First private subnet CIDR address"
-      PrivateSubnetSecondCidr:
-        default: "Second private subnet CIDR address"
-      PrivateSubnetThirdCidr:
-        default: "Third private subnet CIDR address"
 Parameters:
   VPCCidr:
     Type: String

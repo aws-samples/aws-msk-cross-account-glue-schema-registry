@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  **WARNING** This template creates a Schema Registry &
+  AVRO Schema in AWS Glue Schema Registry and an IAM role.
+  You will be billed for the AWS resources used if you
+  create a stack from this template.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Glue Schema Registry & Schema parameters"
+        Parameters:
+          - SchemaRegistryName
+          - SchemaName
+      - Label:
+          default: "Kafka Clients AWS Account details"
+        Parameters:
+          - KafkaclientsAWSAccountId
+    ParameterLabels:
+      SchemaRegistryName:
+        default: "Schema Registry name"
+      SchemaName:
+        default: "Avro Schema name"
+      KafkaclientsAWSAccountId:
+        default: "Kafka Clients AWS Account Account Id"
+Parameters:
+  SchemaRegistryName:
+    Description: Schema Registry name
+    Type: String
+  SchemaName:
+    Description: Avro Schema name
+    Type: String
+  KafkaclientsAWSAccountId:
+    Description: >
+      AWS Account Id where Kafka clients (EC2 Instances) will
+      be hosted. Kafka Clients in that account id will assume the
+      role that is being created by this template.
+    Type: String
+    MinLength: 12
+    MaxLength: 12
+    AllowedPattern: "^[0-9]*$"
+Resources:
+  CrossAccountGlueSchemaRegistryRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:${AWS::Partition}:iam::${KafkaclientsAWSAccountId}:root"
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSGlueSchemaRegistryReadonlyAccess
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref 'CrossAccountGlueSchemaRegistryRole'
+  SchemaRegistry:
+    Type: AWS::Glue::Registry
+    Properties:
+      Description: Cross Account Glue Schema registry
+      Name: !Ref 'SchemaRegistryName'
+  Schema:
+    Type: AWS::Glue::Schema
+    Properties:
+      Compatibility: BACKWARD
+      DataFormat: AVRO
+      Name: !Ref 'SchemaName'
+      Registry:
+        Arn: !GetAtt SchemaRegistry.Arn
+      SchemaDefinition: "{\"type\": \"record\",\"name\": \"UnicornRideRequest\",\"namespace\": \"demo.glue.schema.registry.avro\",\"fields\": [{\"name\": \"request_id\", \"type\": \"int\", \"doc\": \"customer request id\"},{\"name\": \"pickup_address\",\"type\": \"string\",\"doc\": \"customer pickup address\"},{\"name\": \"destination_address\",\"type\": \"string\",\"doc\": \"customer destination address\"},{\"name\": \"ride_fare\",\"type\": \"float\",\"doc\": \"ride fare amount (USD)\"},{\"name\": \"ride_duration\",\"type\": \"int\",\"doc\": \"ride duration in minutes\"},{\"name\": \"preferred_unicorn_color\",\"type\": {\"type\": \"enum\",\"name\": \"UnicornPreferredColor\",\"symbols\": [\"WHITE\",\"BLACK\",\"RED\",\"BLUE\",\"GREY\"]}, \"default\": \"WHITE\"},{\"name\": \"recommended_unicorn\",\"type\": {\"type\": \"record\",\"name\": \"RecommendedUnicorn\",\"fields\": [{\"name\": \"unicorn_id\",\"type\": \"int\", \"doc\": \"recommended unicorn id\"},{\"name\": \"color\",\"type\": {\"type\": \"enum\",\"name\": \"unicorn_color\",\"symbols\": [\"WHITE\",\"RED\",\"BLUE\"]}},{\"name\": \"stars_rating\", \"type\": [\"null\", \"int\"], \"default\": null, \"doc\": \"unicorn star ratings based on customers feedback\"}]}},{\"name\": \"customer\",\"type\": {\"type\": \"record\",\"name\": \"Customer\",\"fields\": [{\"name\": \"customer_account_no\",\"type\": \"int\", \"doc\": \"customer account number\"},{\"name\": \"first_name\",\"type\": \"string\"},{\"name\": \"middle_name\",\"type\": [\"null\",\"string\"], \"default\": null},{\"name\": \"last_name\",\"type\": \"string\"},{\"name\": \"email_addresses\",\"type\": [\"null\", {\"type\":\"array\", \"items\":\"string\" }]},{\"name\": \"customer_address\",\"type\": \"string\",\"doc\": \"customer address\"},{\"name\": \"mode_of_payment\",\"type\": {\"type\": \"enum\",\"name\": \"ModeOfPayment\",\"symbols\": [\"CARD\",\"CASH\"]}, \"default\": \"CARD\"},{\"name\": \"customer_rating\", \"type\": [\"null\", \"int\"], \"default\": null}]}}]}"
+Outputs:
+  CrossAccountGlueSchemaRegistryRoleName:
+    Description: Cross Account Glue Schema Registry role name
+    Value: !Ref CrossAccountGlueSchemaRegistryRole
+    Export:
+      Name: !Sub "${AWS::StackName}-CrossAccountGlueSchemaRegistryRoleName"
+  CrossAccountGlueSchemaRegistryRoleArn:
+    Description: Cross Account Glue Schema Registry role Arn
+    Value: !GetAtt CrossAccountGlueSchemaRegistryRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-CrossAccountGlueSchemaRegistryRoleArn"
+  SchemaRegistryARN:
+    Description: Schema Registry role Arn
+    Value: !GetAtt SchemaRegistry.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-SchemaRegistryArn"
+  SchemaARN:
+    Description: Schema Arn
+    Value: !GetAtt Schema.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-SchemaArn"

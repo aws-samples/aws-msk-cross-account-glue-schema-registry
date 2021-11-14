@@ -5,12 +5,13 @@
  */
 package demo.glue.schema.registry.avro;
 
+import org.apache.avro.generic.GenericArray;
 import org.apache.avro.specific.SpecificData;
+import org.apache.avro.util.Utf8;
 import org.apache.avro.message.BinaryMessageEncoder;
 import org.apache.avro.message.BinaryMessageDecoder;
 import org.apache.avro.message.SchemaStore;
 
-@SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   private static final long serialVersionUID = 3733390049719525866L;
@@ -26,7 +27,16 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
       new BinaryMessageDecoder<RecommendedUnicorn>(MODEL$, SCHEMA$);
 
   /**
+   * Return the BinaryMessageEncoder instance used by this class.
+   * @return the message encoder used by this class
+   */
+  public static BinaryMessageEncoder<RecommendedUnicorn> getEncoder() {
+    return ENCODER;
+  }
+
+  /**
    * Return the BinaryMessageDecoder instance used by this class.
+   * @return the message decoder used by this class
    */
   public static BinaryMessageDecoder<RecommendedUnicorn> getDecoder() {
     return DECODER;
@@ -35,17 +45,27 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
   /**
    * Create a new BinaryMessageDecoder instance for this class that uses the specified {@link SchemaStore}.
    * @param resolver a {@link SchemaStore} used to find schemas by fingerprint
+   * @return a BinaryMessageDecoder instance for this class backed by the given SchemaStore
    */
   public static BinaryMessageDecoder<RecommendedUnicorn> createDecoder(SchemaStore resolver) {
     return new BinaryMessageDecoder<RecommendedUnicorn>(MODEL$, SCHEMA$, resolver);
   }
 
-  /** Serializes this RecommendedUnicorn to a ByteBuffer. */
+  /**
+   * Serializes this RecommendedUnicorn to a ByteBuffer.
+   * @return a buffer holding the serialized data for this instance
+   * @throws java.io.IOException if this instance could not be serialized
+   */
   public java.nio.ByteBuffer toByteBuffer() throws java.io.IOException {
     return ENCODER.encode(this);
   }
 
-  /** Deserializes a RecommendedUnicorn from a ByteBuffer. */
+  /**
+   * Deserializes a RecommendedUnicorn from a ByteBuffer.
+   * @param b a byte buffer holding serialized data for an instance of this class
+   * @return a RecommendedUnicorn instance decoded from the given buffer
+   * @throws java.io.IOException if the given bytes could not be deserialized into an instance of this class
+   */
   public static RecommendedUnicorn fromByteBuffer(
       java.nio.ByteBuffer b) throws java.io.IOException {
     return DECODER.decode(b);
@@ -76,6 +96,7 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
     this.stars_rating = stars_rating;
   }
 
+  public org.apache.avro.specific.SpecificData getSpecificData() { return MODEL$; }
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
   // Used by DatumWriter.  Applications should not call.
   public java.lang.Object get(int field$) {
@@ -83,7 +104,7 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
     case 0: return unicorn_id;
     case 1: return color;
     case 2: return stars_rating;
-    default: throw new org.apache.avro.AvroRuntimeException("Bad index");
+    default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
 
@@ -94,7 +115,7 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
     case 0: unicorn_id = (java.lang.Integer)value$; break;
     case 1: color = (demo.glue.schema.registry.avro.unicorn_color)value$; break;
     case 2: stars_rating = (java.lang.Integer)value$; break;
-    default: throw new org.apache.avro.AvroRuntimeException("Bad index");
+    default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
 
@@ -102,16 +123,17 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
    * Gets the value of the 'unicorn_id' field.
    * @return recommended unicorn id
    */
-  public java.lang.Integer getUnicornId() {
+  public int getUnicornId() {
     return unicorn_id;
   }
+
 
   /**
    * Sets the value of the 'unicorn_id' field.
    * recommended unicorn id
    * @param value the value to set.
    */
-  public void setUnicornId(java.lang.Integer value) {
+  public void setUnicornId(int value) {
     this.unicorn_id = value;
   }
 
@@ -122,6 +144,7 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
   public demo.glue.schema.registry.avro.unicorn_color getColor() {
     return color;
   }
+
 
   /**
    * Sets the value of the 'color' field.
@@ -138,6 +161,7 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
   public java.lang.Integer getStarsRating() {
     return stars_rating;
   }
+
 
   /**
    * Sets the value of the 'stars_rating' field.
@@ -162,7 +186,11 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
    * @return A new RecommendedUnicorn RecordBuilder
    */
   public static demo.glue.schema.registry.avro.RecommendedUnicorn.Builder newBuilder(demo.glue.schema.registry.avro.RecommendedUnicorn.Builder other) {
-    return new demo.glue.schema.registry.avro.RecommendedUnicorn.Builder(other);
+    if (other == null) {
+      return new demo.glue.schema.registry.avro.RecommendedUnicorn.Builder();
+    } else {
+      return new demo.glue.schema.registry.avro.RecommendedUnicorn.Builder(other);
+    }
   }
 
   /**
@@ -171,12 +199,17 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
    * @return A new RecommendedUnicorn RecordBuilder
    */
   public static demo.glue.schema.registry.avro.RecommendedUnicorn.Builder newBuilder(demo.glue.schema.registry.avro.RecommendedUnicorn other) {
-    return new demo.glue.schema.registry.avro.RecommendedUnicorn.Builder(other);
+    if (other == null) {
+      return new demo.glue.schema.registry.avro.RecommendedUnicorn.Builder();
+    } else {
+      return new demo.glue.schema.registry.avro.RecommendedUnicorn.Builder(other);
+    }
   }
 
   /**
    * RecordBuilder for RecommendedUnicorn instances.
    */
+  @org.apache.avro.specific.AvroGenerated
   public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<RecommendedUnicorn>
     implements org.apache.avro.data.RecordBuilder<RecommendedUnicorn> {
 
@@ -199,15 +232,15 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
       super(other);
       if (isValidValue(fields()[0], other.unicorn_id)) {
         this.unicorn_id = data().deepCopy(fields()[0].schema(), other.unicorn_id);
-        fieldSetFlags()[0] = true;
+        fieldSetFlags()[0] = other.fieldSetFlags()[0];
       }
       if (isValidValue(fields()[1], other.color)) {
         this.color = data().deepCopy(fields()[1].schema(), other.color);
-        fieldSetFlags()[1] = true;
+        fieldSetFlags()[1] = other.fieldSetFlags()[1];
       }
       if (isValidValue(fields()[2], other.stars_rating)) {
         this.stars_rating = data().deepCopy(fields()[2].schema(), other.stars_rating);
-        fieldSetFlags()[2] = true;
+        fieldSetFlags()[2] = other.fieldSetFlags()[2];
       }
     }
 
@@ -216,7 +249,7 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
      * @param other The existing instance to copy.
      */
     private Builder(demo.glue.schema.registry.avro.RecommendedUnicorn other) {
-            super(SCHEMA$);
+      super(SCHEMA$);
       if (isValidValue(fields()[0], other.unicorn_id)) {
         this.unicorn_id = data().deepCopy(fields()[0].schema(), other.unicorn_id);
         fieldSetFlags()[0] = true;
@@ -236,9 +269,10 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
       * recommended unicorn id
       * @return The value.
       */
-    public java.lang.Integer getUnicornId() {
+    public int getUnicornId() {
       return unicorn_id;
     }
+
 
     /**
       * Sets the value of the 'unicorn_id' field.
@@ -281,6 +315,7 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
       return color;
     }
 
+
     /**
       * Sets the value of the 'color' field.
       * @param value The value of 'color'.
@@ -320,6 +355,7 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
     public java.lang.Integer getStarsRating() {
       return stars_rating;
     }
+
 
     /**
       * Sets the value of the 'stars_rating' field.
@@ -364,6 +400,8 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
         record.color = fieldSetFlags()[1] ? this.color : (demo.glue.schema.registry.avro.unicorn_color) defaultValue(fields()[1]);
         record.stars_rating = fieldSetFlags()[2] ? this.stars_rating : (java.lang.Integer) defaultValue(fields()[2]);
         return record;
+      } catch (org.apache.avro.AvroMissingFieldException e) {
+        throw e;
       } catch (java.lang.Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);
       }
@@ -388,4 +426,75 @@ public class RecommendedUnicorn extends org.apache.avro.specific.SpecificRecordB
     READER$.read(this, SpecificData.getDecoder(in));
   }
 
+  @Override protected boolean hasCustomCoders() { return true; }
+
+  @Override public void customEncode(org.apache.avro.io.Encoder out)
+    throws java.io.IOException
+  {
+    out.writeInt(this.unicorn_id);
+
+    out.writeEnum(this.color.ordinal());
+
+    if (this.stars_rating == null) {
+      out.writeIndex(0);
+      out.writeNull();
+    } else {
+      out.writeIndex(1);
+      out.writeInt(this.stars_rating);
+    }
+
+  }
+
+  @Override public void customDecode(org.apache.avro.io.ResolvingDecoder in)
+    throws java.io.IOException
+  {
+    org.apache.avro.Schema.Field[] fieldOrder = in.readFieldOrderIfDiff();
+    if (fieldOrder == null) {
+      this.unicorn_id = in.readInt();
+
+      this.color = demo.glue.schema.registry.avro.unicorn_color.values()[in.readEnum()];
+
+      if (in.readIndex() != 1) {
+        in.readNull();
+        this.stars_rating = null;
+      } else {
+        this.stars_rating = in.readInt();
+      }
+
+    } else {
+      for (int i = 0; i < 3; i++) {
+        switch (fieldOrder[i].pos()) {
+        case 0:
+          this.unicorn_id = in.readInt();
+          break;
+
+        case 1:
+          this.color = demo.glue.schema.registry.avro.unicorn_color.values()[in.readEnum()];
+          break;
+
+        case 2:
+          if (in.readIndex() != 1) {
+            in.readNull();
+            this.stars_rating = null;
+          } else {
+            this.stars_rating = in.readInt();
+          }
+          break;
+
+        default:
+          throw new java.io.IOException("Corrupt ResolvingDecoder.");
+        }
+      }
+    }
+  }
 }
+
+
+
+
+
+
+
+
+
+
