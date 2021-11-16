@@ -51,9 +51,12 @@ public class Consumer {
     @Parameter(names={"--role-arn", "-rn"},description="ARN of a role in Glue Schema Registry AWS Account that producer will assume")
     private String assumeRoleARN;
     @Parameter(names={"--region", "-reg"},description="AWS Region where you want to point AWS STS client to e.g. us-east-1 Default is ap-southeast-2. Producer is only checking for the following regions ap-southeast-2, ap-southeast-1, us-east-1, us-east-2, us-west-1, us-west-2")
-    private String regionName = "ap-southeast-2";
+    private String regionName = "us-east-1";
     @Parameter(names={"--topic-name", "-topic"},description="Kafka topic name where you send the data records. Default is unicorn-ride-request-topic")
     private String topic = "unicorn-ride-request-topic";
+    @Parameter(names={"--iam-role-externalid", "-externalid"},description="ExternalId for assuming IAM role in the schema registry account")
+    private String externalId;
+
     private final static Logger logger = LoggerFactory.getLogger(java.util.function.Consumer.class.getName());
 
 
@@ -121,27 +124,14 @@ public class Consumer {
      */
     public void assumeGlueSchemaRegistryRole() {
         try {
-            Region region = null;
-            if(regionName.equalsIgnoreCase("ap-southeast-2"))
-                region = Region.AP_SOUTHEAST_2;
-            if(regionName.equalsIgnoreCase("ap-southeast-1"))
-                region = Region.AP_SOUTHEAST_1;
-            else if (regionName.equalsIgnoreCase("us-east-1"))
-                region = Region.US_EAST_1;
-            else if (regionName.equalsIgnoreCase("us-east-2"))
-                region = Region.US_EAST_2;
-            else if (regionName.equalsIgnoreCase("us-west-1"))
-                region = Region.US_WEST_1;
-            else if (regionName.equalsIgnoreCase("us-west-2"))
-                region = Region.US_WEST_2;
-            if (region == null)
-                throw new RuntimeException("Region: " + regionName + " is not supported by assumeGlueSchemaRegistryRole method for this demo. " +
-                                            "Make sure you pass one of the following regions as a command line argument ap-southeast-2, ap-southeast-1" +
-                                            "us-east-1, us-east-2, us-west-1, us-west-2");
+             Region region = Region.of(regionName);
+             if(!Region.regions().contains(region))
+                throw new RuntimeException("Region : " + regionName + " is invalid.");
             StsClient stsClient = StsClient.builder().region(region).build();
             AssumeRoleRequest roleRequest = AssumeRoleRequest.builder()
                     .roleArn(this.assumeRoleARN)
                     .roleSessionName("kafka-consumer-cross-account-glue-schemaregistry-demo")
+                    .externalId(this.externalId)
                     .build();
             AssumeRoleResponse roleResponse = stsClient.assumeRole(roleRequest);
             Credentials myCreds = roleResponse.credentials();
@@ -150,7 +140,7 @@ public class Consumer {
             System.setProperty("aws.sessionToken", myCreds.sessionToken());
             stsClient.close();
         } catch (StsException e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
             System.exit(1);
         }
     }

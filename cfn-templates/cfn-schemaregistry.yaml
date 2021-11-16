@@ -16,6 +16,10 @@ Metadata:
           default: "Kafka Clients AWS Account details"
         Parameters:
           - KafkaclientsAWSAccountId
+      - Label:
+          default: "IAM Role ExternalId"
+        Parameters:
+          - ExternalId
     ParameterLabels:
       SchemaRegistryName:
         default: "Schema Registry name"
@@ -23,6 +27,8 @@ Metadata:
         default: "Avro Schema name"
       KafkaclientsAWSAccountId:
         default: "Kafka Clients AWS Account Account Id"
+      ExternalId:
+        default: "ExternalId (unique random id) for the IAM Role created by this template"
 Parameters:
   SchemaRegistryName:
     Description: Schema Registry name
@@ -39,6 +45,12 @@ Parameters:
     MinLength: 12
     MaxLength: 12
     AllowedPattern: "^[0-9]*$"
+  ExternalId:
+    Description: "ExternalId is a unique random id used in the trust relationship of the cross-account IAM role. Kafka clients in other AWS account need to provide the same external id while assuming the IAM role in this account"
+    Type: String
+    MinLength: 6
+    MaxLength: 10
+    AllowedPattern: "^[a-zA-Z0-9]*$"
 Resources:
   CrossAccountGlueSchemaRegistryRole:
     Type: AWS::IAM::Role
@@ -52,6 +64,9 @@ Resources:
                 - !Sub "arn:${AWS::Partition}:iam::${KafkaclientsAWSAccountId}:root"
             Action:
               - sts:AssumeRole
+            Condition:
+              StringEquals:
+                sts:ExternalId: !Ref 'ExternalId'
       Path: "/"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSGlueSchemaRegistryReadonlyAccess
