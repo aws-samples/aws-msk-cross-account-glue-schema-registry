@@ -53,7 +53,7 @@ public class Producer {
     private String topic = "unicorn-ride-request-topic";
     @Parameter(names={"--num-messages", "-nm"},description="number of messages you want producer to send. Default is 100")
     private String str_numOfMessages = "100";
-    @Parameter(names={"--iam-role-externalid", "-externalid"},description="ExternalId for assuming IAM role in the schema registry account")
+    @Parameter(names={"--iam-role-externalid", "-externalid"},description="ExternalId required for assuming IAM role in the schema registry account")
     private String externalId;
 
     private final static Logger logger = LoggerFactory.getLogger(org.apache.kafka.clients.producer.Producer.class.getName());

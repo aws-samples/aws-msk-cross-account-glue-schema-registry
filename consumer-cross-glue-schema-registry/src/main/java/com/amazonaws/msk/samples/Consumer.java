@@ -54,7 +54,7 @@ public class Consumer {
     private String regionName = "us-east-1";
     @Parameter(names={"--topic-name", "-topic"},description="Kafka topic name where you send the data records. Default is unicorn-ride-request-topic")
     private String topic = "unicorn-ride-request-topic";
-    @Parameter(names={"--iam-role-externalid", "-externalid"},description="ExternalId for assuming IAM role in the schema registry account")
+    @Parameter(names={"--iam-role-externalid", "-externalid"},description="ExternalId required for assuming IAM role in the schema registry account")
     private String externalId;
 
     private final static Logger logger = LoggerFactory.getLogger(java.util.function.Consumer.class.getName());
