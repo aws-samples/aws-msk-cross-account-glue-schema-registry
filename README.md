@@ -86,7 +86,7 @@ You need
         -nm 500 \
         -externalid <Account B IAM role external Id that you used while creating a CF stack in Account B>
 
-    * -bs: $BOOTSTRAP_SERVERS (MSK cluster Bootstrap brokers)
+    * -bs: $BOOTSTRAP_BROKERS (MSK cluster Bootstrap brokers)
     * -rn: CrossAccountGlueSchemaRegistryRoleArn value from SchemaRegistryStack stack Outputs tab in Account B.
     * -topic: unicorn-ride-request-topic
     * -reg: us-east-1 (change it according to your region, it’s used for AWS STS api call & AWS Glue Schema Registry)
@@ -129,7 +129,7 @@ You need
         -reg us-east-1
         -externalid <Account B IAM role external Id that you used while creating a CF stack in Account B>
 
-    * -bs: $BOOTSTRAP_SERVERS (MSK cluster Bootstrap brokers)
+    * -bs: $BOOTSTRAP_BROKERS (MSK cluster Bootstrap brokers)
     * -rn: CrossAccountGlueSchemaRegistryRoleArn value from SchemaRegistryStack stack Outputs tab in Account B.
     * -topic: unicorn-ride-request-topic
     * -reg: us-east-1 (change it according to your region, it’s used for AWS STS api call & AWS Glue Schema Registry)
