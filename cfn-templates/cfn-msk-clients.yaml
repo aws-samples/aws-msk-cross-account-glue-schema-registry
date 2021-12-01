@@ -129,7 +129,6 @@ Resources:
       AutomaticStopTimeMinutes: 600
       Description: "Cloud9 EC2 environment"
       InstanceType: m5.large
-      Name: "Cloud9EC2Bastion"
       SubnetId: !GetAtt MSKVPCStack.Outputs.PublicSubnetOne
       Tags:
         - Key: 'Purpose'
@@ -182,7 +181,7 @@ Resources:
             cd /home/ec2-user
             ln -s /home/ec2-user/kafka271 /home/ec2-user/kafka
             cd kafka271
-            su -c "wget https://apache.mirror.digitalpacific.com.au/kafka/2.7.1/kafka_2.13-2.7.1.tgz" -s /bin/sh ec2-user
+            su -c "wget https://archive.apache.org/dist/kafka/2.7.1/kafka_2.13-2.7.1.tgz" -s /bin/sh ec2-user
             su -c "tar -xzf kafka_2.13-2.7.1.tgz --strip 1" -s /bin/sh ec2-user
 
             # Download Kafka Producer code on this EC2 instance
@@ -235,7 +234,7 @@ Resources:
           cd /home/ec2-user
           ln -s /home/ec2-user/kafka271 /home/ec2-user/kafka
           cd kafka271
-          su -c "wget https://apache.mirror.digitalpacific.com.au/kafka/2.7.1/kafka_2.13-2.7.1.tgz" -s /bin/sh ec2-user
+          su -c "wget https://archive.apache.org/dist/kafka/2.7.1/kafka_2.13-2.7.1.tgz" -s /bin/sh ec2-user
           su -c "tar -xzf kafka_2.13-2.7.1.tgz --strip 1" -s /bin/sh ec2-user
 
           # Download Kafka Consumer code on this EC2 instance

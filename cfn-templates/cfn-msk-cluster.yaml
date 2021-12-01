@@ -83,10 +83,7 @@ Resources:
         StorageInfo:
           EBSStorageInfo:
             VolumeSize: 100
-      ClusterName: !Join
-        - '-'
-        - - 'MSKCluster'
-          - !Ref 'AWS::StackName'
+      ClusterName: !Ref 'AWS::StackName'
       EncryptionInfo:
         EncryptionInTransit:
           ClientBroker: TLS_PLAINTEXT
