@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: >
   **WARNING** This template creates a Schema Registry &
   AVRO Schema in AWS Glue Schema Registry and an IAM role.
-  You will be billed for the AWS resources used if you
+  You may be billed for the AWS resources used if you
   create a stack from this template.
 Metadata:
   AWS::CloudFormation::Interface:
