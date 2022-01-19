@@ -72,7 +72,7 @@ Resources:
   MSKVPCStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: "https://blogs-cf-template.s3.ap-southeast-2.amazonaws.com/cfn-vpc.yaml"
+      TemplateURL: "https://aws-bigdata-blog.s3.amazonaws.com/artifacts/bdb-1801-cloudformation/cfn-vpc.yaml"
       Parameters:
         VPCCidr: !Ref VPCCidr
         PublicSubnetCidr: !Ref PublicSubnetCidr
@@ -185,7 +185,7 @@ Resources:
             su -c "tar -xzf kafka_2.13-2.7.1.tgz --strip 1" -s /bin/sh ec2-user
 
             # Download Kafka Producer code on this EC2 instance
-            su -c "aws s3 cp s3://blogs-uber-jars/kafka-cross-account-gsr-producer.jar /home/ec2-user" -l ec2-user
+            su -c "aws s3 cp s3://aws-bigdata-blog/artifacts/bdb-1801-cloudformation/kafka-cross-account-gsr-producer.jar /home/ec2-user" -l ec2-user
   KafkaConsumerEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -238,7 +238,7 @@ Resources:
           su -c "tar -xzf kafka_2.13-2.7.1.tgz --strip 1" -s /bin/sh ec2-user
 
           # Download Kafka Consumer code on this EC2 instance
-          su -c "aws s3 cp s3://blogs-uber-jars/kafka-cross-account-gsr-consumer.jar /home/ec2-user" -l ec2-user
+          su -c "aws s3 cp s3://aws-bigdata-blog/artifacts/bdb-1801-cloudformation/kafka-cross-account-gsr-consumer.jar /home/ec2-user" -l ec2-user
 Outputs:
   VPCId:
     Description: The ID of the VPC created
